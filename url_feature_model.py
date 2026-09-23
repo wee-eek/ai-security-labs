@@ -91,3 +91,15 @@ plt.title("Feature Importance (URL lexical features)")
 plt.tight_layout()
 plt.savefig("url_feature_importance.png")
 print("\n模型和图已保存")
+
+print("\n" + "="*50)
+print("随机森林阈值扫描（召回率 vs 误报权衡）")
+print("="*50)
+rf_proba = rf.predict_proba(X_test)[:, 1]
+
+print("阈值  钓鱼召回率  合法误报(FP)  漏报(FN)")
+for t in [0.5, 0.4, 0.3, 0.2, 0.1]:
+    pred = (rf_proba >= t).astype(int)
+    cm = confusion_matrix(y_test, pred)
+    r = cm[1][1] / (cm[1][1] + cm[1][0])
+    print(f"{t:.1f}   {r:.4f}      {cm[0][1]:5d}       {cm[1][0]:5d}")
