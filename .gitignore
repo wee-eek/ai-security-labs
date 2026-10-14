@@ -1,3 +1,6 @@
 venv/ 
 *.joblib 
 data/ 
+results/*.joblib 
+__pycache__/ 
+*.pyc 

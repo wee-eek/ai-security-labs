@@ -21,9 +21,15 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (classification_report, confusion_matrix,
                              roc_auc_score)
 from sklearn.model_selection import train_test_split
+# ---------- 0. 路径定位 ----------
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+DATA_DIR = PROJECT_ROOT / "data"
+RESULTS_DIR = PROJECT_ROOT / "results"
 
 # ---------- 1. 加载数据 ----------
-raw, _ = arff.loadarff("Training Dataset.arff")
+raw, _ = arff.loadarff(DATA_DIR / "Training Dataset.arff")
 df = pd.DataFrame(raw)
 
 
@@ -88,12 +94,12 @@ for i in range(2):
                 color="white" if cm[i, j] > cm.max() / 2 else "black")
 fig.colorbar(im, ax=ax, fraction=0.046)
 fig.tight_layout()
-fig.savefig("confusion_matrix_rf.png", dpi=150)
-print("\n混淆矩阵图已保存: confusion_matrix_rf.png")
+fig.savefig(RESULTS_DIR / "confusion_matrix_rf.png", dpi=150)
+print(f"\n混淆矩阵图已保存: {RESULTS_DIR / 'confusion_matrix_rf.png'}")
 
 # ---------- 5. 保存模型（为 W3-4 主项目预留接口） ----------
-joblib.dump(results["RandomForest"][0], "phishing_model_rf.joblib")
-print("模型已保存: phishing_model_rf.joblib")
+joblib.dump(results["RandomForest"][0], RESULTS_DIR / "phishing_model_rf.joblib")
+print(f"模型已保存: {RESULTS_DIR / 'phishing_model_rf.joblib'}")
 
 # ---------- 6. 看看模型"学到了什么"（面试讲故事用） ----------
 rf = results["RandomForest"][0]

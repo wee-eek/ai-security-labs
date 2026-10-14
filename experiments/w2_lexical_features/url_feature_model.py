@@ -2,15 +2,20 @@ import re
 import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
+from pathlib import Path
 from urllib.parse import urlparse
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 
+# ========== 路径定位 ==========
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+DATA_DIR = PROJECT_ROOT / "data"
+RESULTS_DIR = PROJECT_ROOT / "results"
+
 # ========== 1. 特征提取函数（你刚写好的） ==========
 def extract_features(url):
-    # 单独处理 num_subdomains，防止畸形 URL 让整个脚本崩掉
     try:
         num_subdomains = urlparse(url).netloc.count(".")
     except Exception:
@@ -23,14 +28,14 @@ def extract_features(url):
         "num_digits": sum(c.isdigit() for c in url),
         "has_at": "@" in url,
         "has_ip": bool(re.search(r'\d+\.\d+\.\d+\.\d+', url)),
-        "num_subdomains": num_subdomains,      # ← 用 try 算出来的
+        "num_subdomains": num_subdomains,
         "has_suspicious_word": any(w in url.lower() for w in
                                    ["login", "verify", "secure", "account", "update", "signin"]),
     }
 
 # ========== 2. 读数据 + 提特征 ==========
 print("读取数据中...")
-df = pd.read_csv("data/URL dataset.csv")
+df = pd.read_csv(DATA_DIR / "URL dataset.csv")
 print(f"总样本: {len(df)}")
 
 print("提取特征中（45万条，约1-2分钟）...")
@@ -85,13 +90,14 @@ importances = pd.Series(rf.feature_importances_, index=X.columns).sort_values(as
 print(importances)
 
 # 保存模型和图
-joblib.dump(rf, "url_feature_rf.joblib")
+joblib.dump(rf, RESULTS_DIR / "url_feature_rf.joblib")
 importances.plot(kind="barh", figsize=(8, 5))
 plt.title("Feature Importance (URL lexical features)")
 plt.tight_layout()
-plt.savefig("url_feature_importance.png")
-print("\n模型和图已保存")
+plt.savefig(RESULTS_DIR / "url_feature_importance.png")
+print(f"\n模型和图已保存到: {RESULTS_DIR}")
 
+# ========== 7. 阈值扫描 ==========
 print("\n" + "="*50)
 print("随机森林阈值扫描（召回率 vs 误报权衡）")
 print("="*50)

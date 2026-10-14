@@ -1,7 +1,12 @@
 import pandas as pd
+from pathlib import Path
+
+# ---------- 路径定位 ----------
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+DATA_DIR = PROJECT_ROOT / "data"
 
 # 读数据（注意文件名里有空格）
-df = pd.read_csv("data/URL dataset.csv")
+df = pd.read_csv(DATA_DIR / "URL dataset.csv")
 
 # 1. 看数据规模：期望接近 (450176, 2)
 print("shape:", df.shape)
