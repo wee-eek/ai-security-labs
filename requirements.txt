@@ -4,3 +4,6 @@ scikit-learn
 matplotlib
 scipy
 joblib
+xgboost
+openai
+python-dotenv
